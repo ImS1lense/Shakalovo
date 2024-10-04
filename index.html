@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Зашакалить изображение</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background-color: #2b1b1b;
+        }
+
+        .blur-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(51, 25, 25, 0.8), rgba(15, 5, 5, 1));
+            filter: blur(8px);
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+            background-color: rgba(51, 25, 25, 0.85);
+            padding: 80px;
+            border-radius: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            width: 90%;
+            max-width: 1000px;
+            border: 2px solid rgba(255, 87, 34, 0.3);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            background-color: #8B3A3A;
+            color: white;
+            padding: 20px 50px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 22px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        label:hover {
+            background-color: #FF5722;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.8);
+        }
+
+        img {
+            max-width: 100%;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Ползунок */
+        .slider {
+            width: 100%;
+            margin-top: 30px;
+            appearance: none;
+            height: 10px;
+            background: #8B3A3A;
+            outline: none;
+            transition: background 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .slider:hover {
+            background: #FF5722;
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.8);
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-download {
+            background-color: #8B3A3A;
+            color: white;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 22px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-download:hover {
+            background-color: #FF5722;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.8);
+        }
+
+        .btn-download:active {
+            transform: scale(0.95);
+        }
+
+        .social-icons {
+            margin-top: 40px;
+        }
+
+        .social-icons a {
+            color: #f0f0f0;
+            margin: 0 20px;
+            text-decoration: none;
+            font-size: 36px;
+            transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .social-icons a:hover {
+            color: #FF5722;
+            transform: scale(1.5);
+            text-shadow: 0 0 20px rgba(255, 87, 34, 0.8);
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 34px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .loading {
+            display: none;
+            color: white;
+            font-size: 20px;
+            margin-top: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+<div class="blur-bg"></div>
+<div class="container">
+    <h1>Зашакалить изображение</h1>
+    <input type="file" id="upload" accept="image/*">
+    <label for="upload">Загрузить изображение</label>
+    <br>
+    <input type="range" id="quality" class="slider" min="1" max="100" value="100">
+    <br>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="output" alt="Загруженное изображение">
+    <br>
+    <button class="btn-download" id="downloadBtn">Скачать шакальное изображение</button>
+    <div class="loading" id="loading">Обработка изображения...</div>
+    <div class="social-icons">
+        <a href="https://www.tiktok.com/@dabs1lense?_t=8qG9uFJma0c&_r=1" target="_blank" title="TikTok"><i class="fab fa-tiktok"></i></a>
+        <a href="https://t.me/s1lense812" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
+        <a href="https://discord.com/channels/0s1lense0" target="_blank" title="Discord"><i class="fab fa-discord"></i></a>
+        <a href="https://steamcommunity.com/tradeoffer/new/?partner=1674996683&token=0wMWD2WR" target="_blank" title="Steam Trade"><i class="fab fa-steam"></i></a>
+        <a href="https://steamcommunity.com/profiles/76561199635262411/" target="_blank" title="Steam Profile"><i class="fab fa-steam"></i></a>
+    </div>
+</div>
+
+<script>
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const output = document.getElementById('output');
+    const qualitySlider = document.getElementById('quality');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const loading = document.getElementById('loading');
+    let img = new Image();
+
+    upload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            img.src = event.target.result;
+            img.onload = () => {
+                loading.style.display = 'block';
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                updateImage(qualitySlider.value);
+                loading.style.display = 'none';
+            };
+        };
+        reader.readAsDataURL(file);
+    });
+
+    qualitySlider.addEventListener('input', () => {
+        updateImage(qualitySlider.value);
+    });
+
+    function updateImage(quality) {
+        const qualityLevel = quality / 100;
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        output.src = canvas.toDataURL('image/jpeg', qualityLevel);
+    }
+
+    downloadBtn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = 'shakalimage.jpg';
+        link.href = output.src;
+        link.click();
+    });
+</script>
+</body>
+</html>
